@@ -3,13 +3,28 @@ var API_KEY = "8eff972c11574d061ec4fa0b77b58db1";
 var cityInput = document.querySelector("#city-input");
 var submitBtn = document.querySelector("#submit");
 var weatherDisplay = document.querySelector("#weather-display");
-var cityName = document.querySelector("#city-name");
-var cardGroup = document.querySelector("card-group");
+var cityNameEl = document.querySelector("#city-name");
+var cardGroup = document.querySelector("#card-group");
+var saveBtn = document.querySelector("#saveBtn");
+
+// search btn runs getCity function
+submitBtn.addEventListener("click", getCity);
+
+saveBtn.addEventListener("click", saveClickHandler);
+
+var saveClickHandler = function (event) {
+  var goTo = event.target.getAttribute("data");
+  getCity(goTo);
+};
+
+// set local storage on page refresh
+setLS();
 
 // click event for submit button
 function getCity(event) {
   event.preventDefault();
-  let search = cityInput.value.trim().toUpperCase();
+
+  var search = cityInput.value.trim().toUpperCase();
 
   console.log(search);
 
@@ -17,12 +32,12 @@ function getCity(event) {
     getCity(search);
 
     weatherDisplay.textContent = "";
-    cityName.value = "";
+    cityNameEl.value = "";
+    cardGroup.textContent = "";
   } else {
     alert(`Please Enter a City Name`);
   }
 }
-submitBtn.addEventListener("click", getCity);
 
 // Function to handle getting user input to the city search field
 var getCity = (city) => {
@@ -35,11 +50,14 @@ var getCity = (city) => {
   fetch(api_url)
     .then((res) => {
       if (res.ok) {
-        console.log(res);
         res.json().then((data) => {
-          console.log(data.list);
-          console.log(data);
-          displayWeather(data.list, city);
+          displayWeather(data, city);
+          localStorage.setItem("city", city);
+          var cityBtn = document.createElement("button");
+          cityBtn.classList = "btn btn-success mt-3";
+          cityBtn.setAttribute("data", city);
+          saveBtn.appendChild(cityBtn);
+          cityBtn.textContent = city;
         });
       } else {
         alert("Error: " + res.statusText);
@@ -51,24 +69,27 @@ var getCity = (city) => {
 };
 
 // Display Weather
-var displayWeather = (weathers, cityName) => {
-  if (weathers.length === 0) {
+var displayWeather = (data, cityName) => {
+  if (data.length === 0) {
     weatherDisplay.textContent = "No data found.";
     return;
   }
 
-  cityName.textContent = cityName;
+  // update city name in the DOM
+  cityNameEl.textContent = cityName;
 
+  // getting today's weather displayed
   for (var i = 0; i < 1; i++) {
-    var date = weathers[i].dt_txt;
-    var temp = weathers[i].main.temp;
-    var wind = weathers[i].wind.speed;
-    var humidity = weathers[i].main.humidity;
-    var icon = weathers[i].weather[i].icon;
+    var date = data.list[i].dt_txt;
+    var temp = data.list[i].main.temp;
+    var wind = data.list[i].wind.speed;
+    var humidity = data.list[i].main.humidity;
+    var icon = data.list[i].weather[i].icon;
 
     var justDate = date.split(" ");
     var justtemp = Math.round(temp);
 
+    // setting weather icon
     iconEl = document.createElement("img");
     iconEl.setAttribute(
       "src",
@@ -77,7 +98,8 @@ var displayWeather = (weathers, cityName) => {
     weatherDisplay.appendChild(iconEl);
 
     dateEl = document.createElement("h4");
-    dateEl.textContent = "Date: " + justDate[0];
+    var formatDate = moment(justDate[0]).format("DD/MM/YY");
+    dateEl.textContent = "Date: " + justDate;
     weatherDisplay.appendChild(dateEl);
 
     tempEl = document.createElement("h4");
@@ -92,21 +114,89 @@ var displayWeather = (weathers, cityName) => {
     humidEl.textContent = "Humidity: " + humidity + "%";
     weatherDisplay.appendChild(humidEl);
 
-    console.log(date);
-    console.log(temp);
-    console.log(wind);
-    console.log(humidity);
+    var lat = data.city.coord.lat;
+    var lon = data.city.coord.lon;
+
+    getUvIndex(lat, lon);
   }
 
-  for (var i = 0; i < weathers.length; i++) {
-    var date = weathers[i].dt_txt;
-    var temp = weathers[i].main.temp;
-    var wind = weathers[i].wind.speed;
-    var humidity = weathers[i].main.humidity;
+  // displaying weather forecast for 5 days
 
-    console.log(date);
-    console.log(temp);
-    console.log(wind);
-    console.log(humidity);
+  var previousDate = "";
+  for (var i = 0; i < 40; i++) {
+    var date = data.list[i].dt_txt;
+    var currentDate = moment(date).format("L");
+
+    if (currentDate !== previousDate) {
+      var temp = data.list[i].main.temp;
+      var wind = data.list[i].wind.speed;
+      var humidity = data.list[i].main.humidity;
+
+      newCard = document.createElement("div");
+      newCard.classList = "card";
+      cardGroup.appendChild(newCard);
+
+      innerCard = document.createElement("div");
+      innerCard.classList = "card-body";
+      newCard.appendChild(innerCard);
+
+      // append the date
+      var justDate = date.split(" ");
+      var formatDate = moment(justDate[0]).format("dddd");
+
+      cardContent = document.createElement("h4");
+      cardContent.textContent = formatDate;
+      newCard.appendChild(cardContent);
+
+      // append the temp
+      var justTemp = Math.round(temp);
+      cardContent = document.createElement("h4");
+      cardContent.textContent = "Temp: " + justTemp + " C";
+      innerCard.appendChild(cardContent);
+
+      // append the wind
+      cardContent = document.createElement("h4");
+      cardContent.textContent = "Wind: " + wind + " km/h";
+      innerCard.appendChild(cardContent);
+
+      // append the humidity
+      cardContent = document.createElement("h4");
+      cardContent.textContent = "Humidity: " + humidity + " %";
+      innerCard.appendChild(cardContent);
+    }
+    previousDate = currentDate;
   }
+
+  // console.log(date);
+  // console.log(temp);
+  // console.log(wind);
+  // console.log(humidity);
 };
+
+// retreive UV index by calling api
+var getUvIndex = (lat, lon) => {
+  var api_url = `https://api.openweathermap.org/data/2.5/uvi?appid=${API_KEY}&lat=${lat}&lon=${lon}`;
+
+  fetch(api_url).then((res) => {
+    res.json().then((data) => {
+      displayUvIndex(data);
+    });
+  });
+};
+
+// appends UV index to today's weather and gives it a background color based on the values received
+var displayUvIndex = (index) => {
+  uvIndexValue = document.createElement("h4");
+  uvIndexValue.textContent = "UV Index: " + index.value;
+
+  if (index.value <= 2) {
+    uvIndexValue.classList = "favourable";
+  } else if (index.value > 2 && index.value <= 8) {
+    uvIndexValue.classList = "moderate";
+  } else if (index.value > 8) {
+    uvIndexValue.classList = "severe";
+  }
+  weatherDisplay.appendChild(uvIndexValue);
+};
+
+function setLS() {}

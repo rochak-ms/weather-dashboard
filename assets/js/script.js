@@ -1,9 +1,10 @@
 // variable declaration
+var API_KEY = "8eff972c11574d061ec4fa0b77b58db1";
 var cityInput = document.querySelector("#city-input");
 var submitBtn = document.querySelector("#submit");
 var weatherDisplay = document.querySelector("#weather-display");
 var cityName = document.querySelector("#city-name");
-var API_KEY = "8eff972c11574d061ec4fa0b77b58db1";
+var cardGroup = document.querySelector("card-group");
 
 // click event for submit button
 function getCity(event) {
@@ -26,7 +27,7 @@ submitBtn.addEventListener("click", getCity);
 // Function to handle getting user input to the city search field
 var getCity = (city) => {
   // save city name to city name variable
-  let api_url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`;
+  let api_url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
 
   console.log(api_url);
 
@@ -63,15 +64,47 @@ var displayWeather = (weathers, cityName) => {
     var temp = weathers[i].main.temp;
     var wind = weathers[i].wind.speed;
     var humidity = weathers[i].main.humidity;
+    var icon = weathers[i].weather[i].icon;
 
-    const chars = date.split("");
-    console.log(chars[5]);
+    var justDate = date.split(" ");
+    var justtemp = Math.round(temp);
 
-    dateEl = document.createElement("h3");
-    dateEl.textContent = date;
+    iconEl = document.createElement("img");
+    iconEl.setAttribute(
+      "src",
+      "http://openweathermap.org/img/wn/" + icon + "@2x.png"
+    );
+    weatherDisplay.appendChild(iconEl);
+
+    dateEl = document.createElement("h4");
+    dateEl.textContent = "Date: " + justDate[0];
     weatherDisplay.appendChild(dateEl);
 
-    console.log(typeof date);
+    tempEl = document.createElement("h4");
+    tempEl.textContent = "Temp: " + justtemp + " C";
+    weatherDisplay.appendChild(tempEl);
+
+    windEl = document.createElement("h4");
+    windEl.textContent = "Wind: " + wind + "km/h";
+    weatherDisplay.appendChild(windEl);
+
+    humidEl = document.createElement("h4");
+    humidEl.textContent = "Humidity: " + humidity + "%";
+    weatherDisplay.appendChild(humidEl);
+
+    console.log(date);
+    console.log(temp);
+    console.log(wind);
+    console.log(humidity);
+  }
+
+  for (var i = 0; i < weathers.length; i++) {
+    var date = weathers[i].dt_txt;
+    var temp = weathers[i].main.temp;
+    var wind = weathers[i].wind.speed;
+    var humidity = weathers[i].main.humidity;
+
+    console.log(date);
     console.log(temp);
     console.log(wind);
     console.log(humidity);

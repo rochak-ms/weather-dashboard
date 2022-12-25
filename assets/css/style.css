@@ -1,0 +1,38 @@
+/* importing fonts from google */
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* font-family: 'Cardo', serif; */
+
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Josefin+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* font-family: 'Josefin Sans', sans-serif; */
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body{
+  font-family: 'Josefin Sans', sans-serif;
+  background-color: #fff;
+}
+
+.navbar{
+background-image: linear-gradient(to top, #00c6fb 0%, #005bea 100%);
+font-family: 'Cardo', serif;
+font-weight: 700;
+letter-spacing: 1px;
+box-shadow: 0 .125rem .25rem rgba(0,0,0,0.700)!important;
+}
+
+.fa-solid{
+  background: -webkit-linear-gradient(-24deg, #ffd102 33%, #00d9ff 44%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+
+}
+
+#no-border, .card {
+  border: none;
+}
+
+#disappear {
+  display: none;
+}

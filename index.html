@@ -30,7 +30,7 @@
     <nav class="navbar mb-4 rounded-bottom">
       <div class="container-fluid d-flex justify-content-center">
         <a class="navbar-brand fs-1 text-white" href="./index.html"
-          ><i class="fa-solid fa-cloud-sun-rain"></i>Weather Dashboard</a
+          ><i class="fa-solid fa-cloud-sun-rain"></i> Weather Dashboard</a
         >
       </div>
     </nav>
@@ -40,7 +40,7 @@
         <div id="no-border" class="col-12 col-sm-12 col-md-12 col-lg-3">
           <!-- search bar -->
           <h3 class="text-center text-muted fw-bold">Search for a City:</h3>
-          <div class="input-group">
+          <div class="input-group" id="weather-form">
             <input
               type="text"
               name="city-input"
@@ -48,7 +48,7 @@
               id="city-input"
               placeholder="Enter a City name..."
             />
-            <button class="btn btn-info" type="button">
+            <button class="btn btn-info" type="submit" id="submit">
               <i class="fas fa-search text-body"></i>
             </button>
           </div>

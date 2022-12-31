@@ -154,8 +154,9 @@ function displayWeather(data, city) {
     weatherDisplay.appendChild(iconEl);
 
     // show the temperature
-    tempEl = document.createElement("h4");
-    tempEl.textContent = "Temp: " + justtemp + "\xB0C";
+    tempEl = document.createElement("h1");
+    tempEl.classList = "text-dark w-header";
+    tempEl.textContent = justtemp + "\xB0C";
     weatherDisplay.appendChild(tempEl);
 
     // shows the humidity
@@ -193,16 +194,17 @@ function getFiveDay(data) {
     if (justDate[1] === "03:00:00") {
       // creates a card fir each new day in 5 days forecast
       newCard = document.createElement("div");
-      newCard.classList = "card text-white bg-primary m-1";
+      newCard.classList = "card card-forecast m-1";
       cardGroup.appendChild(newCard);
       innerCard = document.createElement("div");
       innerCard.classList = "card-body";
       newCard.appendChild(innerCard);
 
       // append the date
-      cardContent = document.createElement("h4");
+      cardContent = document.createElement("h3");
+      cardContent.classList = "w-forecast";
       cardContent.textContent = formatDate;
-      newCard.appendChild(cardContent);
+      innerCard.appendChild(cardContent);
 
       // append the icon
       cardContent = document.createElement("img");
@@ -214,17 +216,17 @@ function getFiveDay(data) {
 
       // append the temp
       var justTemp = Math.round(temp);
-      cardContent = document.createElement("h4");
-      cardContent.textContent = "Temp: " + justTemp + "\xB0C";
+      cardContent = document.createElement("h3");
+      cardContent.textContent = justTemp + "\xB0C";
       innerCard.appendChild(cardContent);
 
       // append the wind
-      cardContent = document.createElement("h4");
+      cardContent = document.createElement("h5");
       cardContent.textContent = "Wind: " + wind + " km/h";
       innerCard.appendChild(cardContent);
 
       // append the humidity
-      cardContent = document.createElement("h4");
+      cardContent = document.createElement("h5");
       cardContent.textContent = "Humidity: " + humidity + " %";
       innerCard.appendChild(cardContent);
     }

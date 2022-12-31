@@ -41,18 +41,21 @@ box-shadow: 0 .125rem .25rem rgba(0,0,0,0.700)!important;
   background-color: lightgreen;
   width: 200px;
   margin: 0 auto;
+  border-radius: .25rem;
 }
 
 .moderate {
   background-color: orange;
   width: 200px;
   margin: 0 auto;
+  border-radius: .25rem;
 }
 
 .severe {
   background-color: red;
   width: 200px;
   margin: 0 auto;
+  border-radius: .25rem;
 }
 
 @media screen and (max-width: 767px) {

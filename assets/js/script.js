@@ -6,7 +6,9 @@ var weatherDisplay = document.querySelector("#weather-display");
 var cityNameEl = document.querySelector("#city-name");
 var cardGroup = document.querySelector("#card-group");
 var savedBtn = document.querySelector("#hereThis");
-var clearBtn = document.querySelector("#clear");
+var clearBtn = document.querySelector("#btnclear");
+var cardDisplay = document.querySelector(".card");
+var hideThis = document.querySelector("#disappear");
 
 var cities = JSON.parse(localStorage.getItem("cities")) || [];
 // search btn runs getCity function
@@ -15,9 +17,8 @@ submitBtn.addEventListener("click", getCity);
 // format users search term, make sure they enter something
 function getCity(event) {
   event.preventDefault();
-
+  cardDisplay.setAttribute("border", "1px");
   var search = cityInput.value.trim().toUpperCase();
-
   if (search) {
     getCity(search);
 
@@ -40,13 +41,14 @@ var getCity = (city) => {
       if (res.ok) {
         res.json().then((data) => {
           displayWeather(data, city);
+          hideThis.style.display = "block";
         });
       } else {
         alert("Error: " + res.statusText);
       }
     })
     .catch((err) => {
-      alert("Unable to connect to Open Weather");
+      alert("Unable to connect to Open Weather API");
     });
   cities.push(city);
   saveSearch();
@@ -61,7 +63,9 @@ getStorage();
 
 function getStorage() {
   var storedCities = JSON.parse(localStorage.getItem("cities"));
-
+  if (storedCities === null) {
+    return;
+  }
   for (var i = 0; i < storedCities.length; i++) {
     var cityButton = document.createElement("button");
     cityButton.classList = "btn btn-primary mt-3";
@@ -70,8 +74,12 @@ function getStorage() {
     savedBtn.appendChild(cityButton);
     cityButton.textContent = storedCities[i];
   }
+  if (storedCities !== null) {
+    cities = storedCities;
+  }
 }
 
+// creates buttons from previous searches
 var pastSearch = (city) => {
   var cityButton = document.createElement("button");
   cityButton.classList = "btn btn-primary mt-3";
@@ -93,13 +101,14 @@ var pastSearchHandler = (event) => {
       if (res.ok) {
         res.json().then(function (data) {
           displayWeather(data, city);
+          hideThis.style.display = "block";
         });
       } else {
         alert("Error: " + res.statusText);
       }
     })
     .catch(function (error) {
-      alert("Unable to connect tp Open Weather");
+      alert("Unable to connect Open Weather API");
     });
 };
 
@@ -115,12 +124,13 @@ function displayWeather(data, city) {
 
   // update city name in the DOM
   cityNameEl.textContent = city;
+
   for (let i = 0; i < 1; i++) {
-    var date = data.list[0].dt_txt;
-    var temp = data.list[0].main.temp;
-    var wind = data.list[0].wind.speed;
-    var humidity = data.list[0].main.humidity;
-    var iconWeather = data.list[0].weather[0].icon;
+    var date = data.list[i].dt_txt;
+    var temp = data.list[i].main.temp;
+    var wind = data.list[i].wind.speed;
+    var humidity = data.list[i].main.humidity;
+    var iconWeather = data.list[i].weather[0].icon;
     var justDate = date.split(" ");
     var justtemp = Math.round(temp);
 
@@ -162,20 +172,28 @@ function displayWeather(data, city) {
   function getFiveDay(data) {
     // loops through array to pull the 5 days, excluding 3hours time intevals
 
-    for (var i = 0; i < data.list.length; i = i + 8) {
+    for (var i = 5; i < data.list.length; i = i + 8) {
       var date = data.list[i].dt_txt;
-      var next = data.list[i];
+      var iconic = data.list[i].weather[0].icon;
       var temp = data.list[i].main.temp;
       var wind = data.list[i].wind.speed;
       var humidity = data.list[i].main.humidity;
 
       newCard = document.createElement("div");
-      newCard.classList = "card";
+      newCard.classList = "card text-white bg-dard m-1";
       cardGroup.appendChild(newCard);
 
       innerCard = document.createElement("div");
       innerCard.classList = "card-body";
       newCard.appendChild(innerCard);
+
+      // append the icon
+      cardContent = document.createElement("img");
+      cardContent.setAttribute(
+        "src",
+        "http://openweathermap.org/img/wn/" + iconic + "@2x.png"
+      );
+      innerCard.appendChild(cardContent);
 
       // append the date
       var justDate = date.split(" ");
@@ -228,3 +246,16 @@ var displayUvIndex = (index) => {
   }
   weatherDisplay.appendChild(uvIndexValue);
 };
+
+// on click run clear storage
+clearBtn.addEventListener("click", clearStorage);
+
+function clearStorage() {
+  localStorage.clear();
+  savedBtn.innerHTML = "";
+  weatherDisplay.textContent = "";
+  cityNameEl.value = "";
+  cardGroup.textContent = "";
+  cities = [];
+  hideThis.style.display = "none";
+}

@@ -10,7 +10,9 @@ var clearBtn = document.querySelector("#btnclear");
 var cardDisplay = document.querySelector(".card");
 var hideThis = document.querySelector("#disappear");
 
+// local storage goes here
 var cities = JSON.parse(localStorage.getItem("cities")) || [];
+
 // search btn runs getCity function
 submitBtn.addEventListener("click", getCity);
 
@@ -21,10 +23,10 @@ function getCity(event) {
   var search = cityInput.value.trim().toUpperCase();
   if (search) {
     getCity(search);
-
     weatherDisplay.textContent = "";
-    cityNameEl.value = "";
+    cityNameEl.textContent = "";
     cardGroup.textContent = "";
+    cityInput.value = "";
   } else {
     alert(`Please Enter a City Name`);
   }
@@ -55,10 +57,12 @@ var getCity = (city) => {
   pastSearch(city);
 };
 
+// sets local storage
 function saveSearch() {
   localStorage.setItem("cities", JSON.stringify(cities));
 }
 
+// get local storage on a page
 getStorage();
 
 function getStorage() {
@@ -89,6 +93,7 @@ var pastSearch = (city) => {
   cityButton.textContent = city;
 };
 
+// make an api call on the saved data
 var pastSearchHandler = (event) => {
   var city = event.target.getAttribute("data");
   weatherDisplay.textContent = "";
@@ -123,7 +128,7 @@ function displayWeather(data, city) {
   }
 
   // update city name in the DOM
-  cityNameEl.textContent = city;
+  cityNameEl.textContent = city + ", " + data.city.country;
 
   for (let i = 0; i < 1; i++) {
     var date = data.list[i].dt_txt;
@@ -134,6 +139,12 @@ function displayWeather(data, city) {
     var justDate = date.split(" ");
     var justtemp = Math.round(temp);
 
+    // shows the date
+    dateEl = document.createElement("h4");
+    var formatDate = moment(justDate[0]).format("dddd, MMMM Do YYYY");
+    dateEl.textContent = formatDate;
+    weatherDisplay.appendChild(dateEl);
+
     // setting weather icon
     iconEl = document.createElement("img");
     iconEl.setAttribute(
@@ -142,50 +153,56 @@ function displayWeather(data, city) {
     );
     weatherDisplay.appendChild(iconEl);
 
-    // shows the date
-    dateEl = document.createElement("h4");
-    var formatDate = moment(justDate[0]).format("dddd, MMMM Do YYYY");
-    dateEl.textContent = "Date: " + formatDate;
-    weatherDisplay.appendChild(dateEl);
-
     // show the temperature
     tempEl = document.createElement("h4");
-    tempEl.textContent = "Temp: " + justtemp + " C";
+    tempEl.textContent = "Temp: " + justtemp + "\xB0C";
     weatherDisplay.appendChild(tempEl);
-
-    // shows the wind speed
-    windEl = document.createElement("h4");
-    windEl.textContent = "Wind: " + wind + "km/h";
-    weatherDisplay.appendChild(windEl);
 
     // shows the humidity
     humidEl = document.createElement("h4");
     humidEl.textContent = "Humidity: " + humidity + "%";
     weatherDisplay.appendChild(humidEl);
 
+    // shows the wind speed
+    windEl = document.createElement("h4");
+    windEl.textContent = "Wind: " + wind + "km/h";
+    weatherDisplay.appendChild(windEl);
+
+    // get data to display UV index
     var lat = data.city.coord.lat;
     var lon = data.city.coord.lon;
     getUvIndex(lat, lon);
     getFiveDay(data);
   }
+}
 
-  function getFiveDay(data) {
-    // loops through array to pull the 5 days, excluding 3hours time intevals
+function getFiveDay(data) {
+  // loops through array to pull the 5 days, excluding 3hours time intevals
+  var forecast = data.list;
 
-    for (var i = 5; i < data.list.length; i = i + 8) {
-      var date = data.list[i].dt_txt;
-      var iconic = data.list[i].weather[0].icon;
-      var temp = data.list[i].main.temp;
-      var wind = data.list[i].wind.speed;
-      var humidity = data.list[i].main.humidity;
+  for (var i = 0; i < forecast.length; i++) {
+    var date = data.list[i].dt_txt;
+    var iconic = data.list[i].weather[0].icon;
+    var temp = data.list[i].main.temp;
+    var wind = data.list[i].wind.speed;
+    var humidity = data.list[i].main.humidity;
+    var justDate = date.split(" ");
+    var formatDate = moment(justDate[0]).format("dddd");
 
+    // return day result for future days
+    if (justDate[1] === "03:00:00") {
+      // creates a card fir each new day in 5 days forecast
       newCard = document.createElement("div");
-      newCard.classList = "card text-white bg-dard m-1";
+      newCard.classList = "card text-white bg-primary m-1";
       cardGroup.appendChild(newCard);
-
       innerCard = document.createElement("div");
       innerCard.classList = "card-body";
       newCard.appendChild(innerCard);
+
+      // append the date
+      cardContent = document.createElement("h4");
+      cardContent.textContent = formatDate;
+      newCard.appendChild(cardContent);
 
       // append the icon
       cardContent = document.createElement("img");
@@ -195,17 +212,10 @@ function displayWeather(data, city) {
       );
       innerCard.appendChild(cardContent);
 
-      // append the date
-      var justDate = date.split(" ");
-      var formatDate = moment(justDate[0]).format("dddd");
-      cardContent = document.createElement("h4");
-      cardContent.textContent = formatDate;
-      newCard.appendChild(cardContent);
-
       // append the temp
       var justTemp = Math.round(temp);
       cardContent = document.createElement("h4");
-      cardContent.textContent = "Temp: " + justTemp + " C";
+      cardContent.textContent = "Temp: " + justTemp + "\xB0C";
       innerCard.appendChild(cardContent);
 
       // append the wind

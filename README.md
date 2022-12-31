@@ -28,7 +28,7 @@ The weather dashboard that fetches data from the OpenWeatherMap API to dynamical
 
 ## Installation
 
-Download or Clone this project from the repository from GitHub repository link provided in the links section below and download Node. And download Node.js and Express.js.
+Note Installation required. Just open the deployed app link provided in the links section below and start using the application.
 
 ## Usage
 
